@@ -1,7 +1,7 @@
-// Global DOM variables
-const phrase = document.getElementById("phrase");
+// DOM Selections
 const keyboard = document.getElementById("qwerty");
-const startGameBtn = document.getElementsByClassName("btn__reset")[0];
+const phrase = document.getElementById("phrase");
+const startButton = document.querySelector(".btn__reset");
 const overlay = document.getElementById("overlay");
 
 
@@ -21,81 +21,84 @@ const phrases = [
                     "You live learn and upgrade"
                 ];
 
-const getRandomPhraseArr = (arr) => {
-    const index = Math.floor(Math.random() * arr.length);
-    const phraseArr = arr[index].split("");
-    return phraseArr ;
+const getRandomPhraseAsArray = (arr)=>{
+    const index = Math.floor(Math.random() * phrases.length);
+    return arr[index].split("");
 };
 
-const addPhraseToDisplay = (arr) =>{
+const addPhrasetoDisplay = (arr) => {
     const ul = document.querySelector("ul");
-    for(let i = 0; i < arr.length; i++){
-        let li = document.createElement('li');
-        li.textContent = arr[i];
+    for(let i = 0; i< arr.length; i++){
+        let li = document.createElement("li");
+        li.textContent =arr[i];
         if(/\s+/.test(li.textContent)){
             li.className = "space";
         } else {
             li.className = "letter";
         }
-
         ul.appendChild(li);
     }
 };
 
 const checkLetter = (clickedBtn)=>{
-    const letters = document.getElementsByClassName("letter");
+    const letters =document.querySelectorAll(".letter");
     let match = null;
-    for(let i = 0; i < letters.length; i++){
-        if(letters[i].textContent.toLowerCase() === clickedBtn){
+    for(let i = 0; i <letters.length; i++){
+        if(clickedBtn === letters[i].textContent.toLowerCase()){
             letters[i].classList.add("show");
-            match = clickedBtn;        
-        } 
+            match = clickedBtn;
+        }
     }
     return match;
+};
+
+const missedGuess = () => {
+    const heartLi= document.querySelectorAll(".tries")[0];
+    const heartImg = heartLi.firstElementChild;
+    heartImg.src = "images/lostHeart.png"
+    heartLi.className ="lost";
+    misses++
+};
+
+const endGameOverlay = (result, message) => {
+    overlay.className = result;
+    overlay.firstElementChild.textContent = message;
+    overlay.style.display = "flex";
 }
 
-const loseTry = () => {
-    const heartLi = document.getElementsByClassName("tries")[0];
-    const heartImg = heartLi.firstElementChild;
-    heartLi.className = "";
-    heartImg.src = "images/lostHeart.png"
-    misses++;
-};
-
 const checkWin = () => {
-    const letters = document.getElementsByClassName("letter");
-    const shown = document.getElementsByClassName("show");
-    if(letters.length === shown.length){
-        overlay.className = "win";
-        overlay.style.display = "flex";
+    const letters =document.querySelectorAll(".letter");
+    const show =document.querySelectorAll(".show");
+    if(letters.length === show.length){
+        endGameOverlay("win", "You Won");
     } else if(misses > 4){
-        overlay.className = "lose"
-        overlay.style.display ="flex";
+        endGameOverlay("lose", "You Lost");
     }
-};
+
+}
 
 
-const phraseArr = getRandomPhraseArr(phrases);
-addPhraseToDisplay(phraseArr);
+const phraseArray = getRandomPhraseAsArray(phrases);
+addPhrasetoDisplay(phraseArray); 
 
 
 
 // Event Handlers
-const handleStartGame = () => {
-    const overlay = startGameBtn.parentNode;
-    overlay.style.display="none";
+
+const hideOverlay = ( ) => {
+    startButton.parentNode.style.display= "none";
 };
 
-
-const handleLetterCheck = (evt)=>{
+const handleLetterSelection = (evt) => {
     const clickedBtn = evt.target;
-    if(clickedBtn.tagName === 'BUTTON'){
+    const btnLetter = clickedBtn.textContent;
+    if(clickedBtn.tagName === "BUTTON"){
         clickedBtn.className = "chosen";
         clickedBtn.disabled = true;
-        let letterFound = checkLetter(clickedBtn.textContent);
-        if(letterFound === null){
-            loseTry();
-        } 
+        let result = checkLetter(btnLetter);
+        if(result === null) {
+            missedGuess();
+        }
     }
     checkWin();
 }
@@ -108,7 +111,6 @@ const handleLetterCheck = (evt)=>{
 
 
 
-
 // Event Listeners
-startGameBtn.addEventListener("click", handleStartGame);
-keyboard.addEventListener("click",  handleLetterCheck);
+startButton.addEventListener("click", hideOverlay);
+keyboard.addEventListener("click", handleLetterSelection);
