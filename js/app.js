@@ -5,6 +5,7 @@ const startButton = document.querySelector(".btn__reset");
 const overlay = document.getElementById("overlay");
 
 
+
 // Game logic
 let misses = 0;
 
@@ -63,7 +64,11 @@ const missedGuess = () => {
 const endGameOverlay = (result, message) => {
     overlay.className = result;
     overlay.firstElementChild.textContent = message;
+    overlay.lastElementChild.textContent = "New Game";
     overlay.style.display = "flex";
+    if(overlay.contains(newGameBtn) !== true){
+        overlay.appendChild(newGameBtn);
+    }
 }
 
 const checkWin = () => {
@@ -77,8 +82,33 @@ const checkWin = () => {
 
 }
 
+const enableBtns = ()=> {
+    const disabled = document.querySelectorAll(".chosen");
+    for(let i = 0; i < disabled.length; i++){
+        disabled[i].className = "";
+        disabled[i].disabled = false;
+    }
+};
 
-const phraseArray = getRandomPhraseAsArray(phrases);
+const resetGuess = () => {
+    const lost = document.querySelectorAll(".lost");
+    for(let i = 0; i < lost.length; i++){
+        lost[i].className = "tries";
+        lost[i].firstChild.src = "images/liveHeart.png";
+        misses = 0;
+    }
+};
+
+const clearPhrase = () => {
+    const oldPhrase = document.querySelector("ul");
+    const newUl = document.createElement("ul");
+    phrase.removeChild(oldPhrase);
+    phrase.appendChild(newUl);
+}
+
+
+
+let phraseArray = getRandomPhraseAsArray(phrases);
 addPhrasetoDisplay(phraseArray); 
 
 
@@ -103,6 +133,23 @@ const handleLetterSelection = (evt) => {
     checkWin();
 }
 
+const newGame = (evt) => {
+    const btn = evt.target;
+    if(btn.tagName === "A"){
+        if(btn.textContent === "New Game"){
+            enableBtns();
+            resetGuess();
+            clearPhrase();
+            phraseArray = getRandomPhraseAsArray(phrases);
+            addPhrasetoDisplay(phraseArray);
+            overlay.style.display = "none";
+        }
+
+    }
+
+}
+
+
 
 
 
@@ -114,3 +161,4 @@ const handleLetterSelection = (evt) => {
 // Event Listeners
 startButton.addEventListener("click", hideOverlay);
 keyboard.addEventListener("click", handleLetterSelection);
+overlay.addEventListener("click", newGame);
