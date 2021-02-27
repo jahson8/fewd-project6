@@ -66,9 +66,6 @@ const endGameOverlay = (result, message) => {
     overlay.firstElementChild.textContent = message;
     overlay.lastElementChild.textContent = "New Game";
     overlay.style.display = "flex";
-    if(overlay.contains(newGameBtn) !== true){
-        overlay.appendChild(newGameBtn);
-    }
 }
 
 const checkWin = () => {
